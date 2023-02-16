@@ -33,11 +33,11 @@ const App = () => {
 
   const [tasks, setTasks] = useState([
     {
-      title: "comer patatas",
+      title: "implementar CI CD",
       completed: false
     },
     {
-      title: "hacer que Tania no compre ganchitos",
+      title: "usar git",
       completed: false
     }
   ])
