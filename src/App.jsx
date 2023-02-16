@@ -1,47 +1,51 @@
 import { Button, Card, TextField, CircularProgress } from "@mui/material"
 import "./App.css"
 import { Grid } from "@mui/material"
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 
 const App = () => {
-  const taskField = useRef("pepe")
+  const taskField = useRef("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [inputError, setInputError] = useState(false)
+  const [tasks, setTasks] = useState(JSON.parse(localStorage.getItem('todos')) ?? [])
+
+
+  useEffect(() => {
+    localStorage.setItem('todos',  JSON.stringify(tasks))
+  }, [tasks])
 
   const addTask = () => {
-    setTasks([...tasks, {title: taskField.current.value, completed: false}])
+
+    if ( taskField.current.value === '' ) {
+      setInputError(true)
+      return
+    }
+    setInputError(false)
+    setTasks([...tasks, { title: taskField.current.value, completed: false, id: taskField.current.value+Math.random() }])
+    
     taskField.current.value = ""
   }
 
   const addRandomTask = () => {
-
     setIsLoading(true)
-   fetch('https://dummyjson.com/todos/random')
-    .then(res => res.json())
-    .then(data => {
-      setIsLoading(false)
-      setTasks([...tasks, { title: data.todo, completed: false }])
-    })
+    fetch("https://dummyjson.com/todos/random")
+      .then((res) => res.json())
+      .then((data) => {
+        setIsLoading(false)
+        setTasks([...tasks, { title: data.todo, completed: false, id: data.id }])
+      })
   }
 
-  const completeTask = (task) => {
-    const newTasks = tasks.map(t => {
-      return task.title === t.title ? {title: t.title, completed: !t.completed} : t
+  const completeTask = task => {
+    const newTasks = tasks.map( t => {
+      return task.id === t.id ? { title: t.title, completed: !t.completed, id: t.id } : t
     })
     setTasks(newTasks)
   }
 
-  const [isLoading, setIsLoading] = useState(false)
+ 
 
-  const [tasks, setTasks] = useState([
-    {
-      title: "Hacer la cena",
-      completed: false
-    },
-    {
-      title: "usar git",
-      completed: false
-    }
-  ])
-
+  
 
   return (
     <div className="App">
@@ -54,11 +58,14 @@ const App = () => {
           <Grid xs={12}>
             {tasks.map((t) => {
               return (
-                  <h2 style={ t.completed ? {textDecoration: "line-through"} : null }>{t.title} 
-                  {
-                    !t.completed ? <Button variant="outlined" onClick={() => completeTask(t)}>Complete task</Button> : null
-                  } 
-                  </h2>
+                <h2 key={t.id} style={t.completed ? { textDecoration: "line-through" } : null}>
+                  {t.title}
+                  {!t.completed ? (
+                    <Button variant="outlined" onClick={() => completeTask(t)}>
+                      Complete task
+                    </Button>
+                  ) : null}
+                </h2>
               )
             })}
           </Grid>
@@ -69,8 +76,11 @@ const App = () => {
             <TextField
               id="outlined-basic"
               label="Here your task"
+              error={inputError}
+              helperText={ inputError ? "You need to write somerthing before" : null}
               variant="outlined"
               inputRef={taskField}
+              onKeyDown={e => e.key === 'Enter' ?  addTask() : setInputError(false)}
             />
           </Grid>
           <Grid xs={4}>
@@ -79,9 +89,7 @@ const App = () => {
             </Button>
             <Button onClick={() => addRandomTask()} variant="outlined">
               Add random task &nbsp;
-              {
-                isLoading && <CircularProgress color="primary" size='1rem'/>
-              } 
+              {isLoading && <CircularProgress color="primary" size="1rem" />}
             </Button>
           </Grid>
         </Grid>
