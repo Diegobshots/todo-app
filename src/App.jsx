@@ -33,7 +33,7 @@ const App = () => {
 
   const [tasks, setTasks] = useState([
     {
-      title: "implementar CI CD",
+      title: "Hacer la cena",
       completed: false
     },
     {
