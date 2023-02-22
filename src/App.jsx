@@ -1,4 +1,5 @@
 import { Button, Card, TextField, Container } from "@mui/material"
+import CheckIcon from '@mui/icons-material/Check';
 import LoadingButton from "@mui/lab/LoadingButton"
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd"
 import LowPriorityIcon from "@mui/icons-material/LowPriority"
@@ -64,8 +65,10 @@ const App = () => {
                       <Button
                         variant="outlined"
                         onClick={() => completeTask(t)}
+                        sx={{ ml: '1em'}}
+                        endIcon={<CheckIcon/>}
                       >
-                        Complete task
+                        <span>Complete task</span>
                       </Button>
                     ) : null}
                   </h2>
